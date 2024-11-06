@@ -16,7 +16,11 @@ jobs:
 
     steps:
     - name: Checkout repository
+<<<<<<< HEAD
       uses: actions/checkout@v4
+=======
+      uses: actions/checkout@v2
+>>>>>>> 94134ccecd5b3dcb6085f6927d7bdded8fb2774f
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
@@ -26,9 +30,12 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+<<<<<<< HEAD
     - name: Set permissions for ESLint
       run: chmod +x ./node_modules/.bin/eslint
 
+=======
+>>>>>>> 94134ccecd5b3dcb6085f6927d7bdded8fb2774f
     - name: Run lint
       run: npm run lint
 
