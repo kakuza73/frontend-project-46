@@ -1,32 +1,49 @@
 import _ from 'lodash';
 
-const extractValue = (value) => {
-  if (typeof value === 'string') return `'${value}'`;
-  return _.isObject(value) ? '[complex value]' : String(value);
+const getPath = (nodeNames) => nodeNames.flat().join('.');
+
+const getFormattedValue = (value) => {
+  switch (typeof value) {
+    case 'object': {
+      return !value ? 'null' : '[complex value]';
+    }
+    case 'string': {
+      return `'${value}'`;
+    }
+    default: {
+      return `${value}`;
+    }
+  }
 };
 
-const formatPlainOutput = (tree) => {
-  const inner = (currentValue, path) => {
-    const lines = Object.entries(currentValue).flatMap(([key, value]) => {
-      const fullPath = (path === '') ? key : `${path}.${key}`;
-      switch (value.type) {
-        case 'nested':
-          return inner(value.children, fullPath);
-        case 'deleted':
-          return `Property '${fullPath}' was removed`;
-        case 'added':
-          return `Property '${fullPath}' was added with value: ${extractValue(value.value)}`;
-        case 'unchanged':
-          return []; // Просто пропускаем, не добавляем ничего
-        case 'changed':
-          return `Property '${fullPath}' was updated. From ${extractValue(value.oldValue)} to ${extractValue(value.newValue)}`;
-        default:
-          throw new Error(`Unknown type ${value.type}.`);
+export function makePlainDiff(tree) {
+  const iter = (node, path) => node.map((child) => {
+    const currentPath = getPath([path, child.key]);
+    switch (child.type) {
+      case 'nested': {
+        return iter(child.children, currentPath);
       }
-    });
-    return lines.join('\n');
-  };
-  return inner(tree, '');
-};
+      case 'added': {
+        return `Property '${currentPath}' was added with value: ${getFormattedValue(child.value)}`;
+      }
+      case 'changed': {
+        return `Property '${currentPath}' was updated. From ${getFormattedValue(child.oldValue)} to ${getFormattedValue(child.newValue)}`;
+      }
+      case 'removed': {
+        return `Property '${currentPath}' was removed`;
+      }
+      case 'unchanged': {
+        return null;
+      }
+      default: {
+        throw Error('Uncorrect data');
+      }
+    }
+  });
+  return iter(tree.children, []);
+}
 
-export default formatPlainOutput;
+export default function makePlain(data) {
+  const result = makePlainDiff(data);
+  return _.flattenDeep(result).filter((el) => el).join('\n');
+}

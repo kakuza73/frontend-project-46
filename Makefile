@@ -1,22 +1,17 @@
-install:	install-deps
-
-install-deps:
-	npm ci
-
-publish:
-	npm publish --dry-run
-
-lint:
-	npx eslint .
-
-lint-fix:
-	npx eslint . --fix
+install:
+		npm install
 
 gendiff:
-	node bin/gendiff.js
+		bin/gendiff.js
+
+publish:
+		npm publish --dry-run
+
+run:
+		node bin/gendiff file1.json file2.json
 
 test:
-	npx jest
+		npm test
 
-test-coverage:
-	npx jest --coverage --coverageProvider=v8
+lint:
+		npx eslint .
