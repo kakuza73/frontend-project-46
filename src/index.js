@@ -1,25 +1,22 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import parser from './parsers.js';
-import getDifferenceTree from './buildAST.js';
-import formatter from './formatters/index.js';
+import fs from 'fs';
+import path from 'path';
+import parse from './parse.js';
+import buildTreeDiff from './ast.js';
+import chooseFormatter from './formatters/index.js';
 
-const resolvePath = (filePath) => (filePath.includes('__fixtures__')
-  ? path.resolve(process.cwd(), filePath)
-  : path.resolve(process.cwd(), `__fixtures__/${filePath}`));
+const getReadFile = (filepath) => {
+  const absolutePath = path.resolve(filepath);
+  const format = path.extname(absolutePath).slice(1);
+  const readfileData = fs.readFileSync(absolutePath, 'utf-8');
+  return parse(format, readfileData);
+};
 
-const getExtension = (filename) => path.extname(filename).slice(1);
-
-const getData = (filePath) => parser(readFileSync(filePath, 'utf-8'), getExtension(filePath));
-
-const gendiff = (filePath1, filePath2, format = 'stylish') => {
-  const path1 = resolvePath(filePath1);
-  const path2 = resolvePath(filePath2);
-
-  const data1 = getData(path1);
-  const data2 = getData(path2);
-
-  return formatter(getDifferenceTree(data1, data2), format);
+const gendiff = (filePath1, filePath2, formatName = 'stylish') => {
+  const file1 = getReadFile(filePath1);
+  const file2 = getReadFile(filePath2);
+  const ast = buildTreeDiff(file1, file2);
+  const formatAST = chooseFormatter(ast, formatName);
+  return formatAST;
 };
 
 export default gendiff;

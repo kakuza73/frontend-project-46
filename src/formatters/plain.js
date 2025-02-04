@@ -1,49 +1,33 @@
 import _ from 'lodash';
 
-const getPath = (nodeNames) => nodeNames.flat().join('.');
-
-const getFormattedValue = (value) => {
-  switch (typeof value) {
-    case 'object': {
-      return !value ? 'null' : '[complex value]';
-    }
-    case 'string': {
-      return `'${value}'`;
-    }
-    default: {
-      return `${value}`;
-    }
+const stringify = (value) => {
+  if (_.isObject(value)) {
+    return '[complex value]';
+  } if (_.isString(value)) {
+    return `'${value}'`;
   }
+  return `${value}`;
 };
 
-export function makePlainDiff(tree) {
-  const iter = (node, path) => node.map((child) => {
-    const currentPath = getPath([path, child.key]);
-    switch (child.type) {
-      case 'nested': {
-        return iter(child.children, currentPath);
-      }
-      case 'added': {
-        return `Property '${currentPath}' was added with value: ${getFormattedValue(child.value)}`;
-      }
-      case 'changed': {
-        return `Property '${currentPath}' was updated. From ${getFormattedValue(child.oldValue)} to ${getFormattedValue(child.newValue)}`;
-      }
-      case 'removed': {
-        return `Property '${currentPath}' was removed`;
-      }
-      case 'unchanged': {
-        return null;
-      }
-      default: {
-        throw Error('Uncorrect data');
-      }
+const treeFormatterPlain = (tree, parentKey = '') => {
+  const result = tree.flatMap((node) => {
+    const fullKey = parentKey ? `${parentKey}.${node.key}` : node.key;
+    switch (node.status) {
+      case 'added':
+        return `Property '${fullKey}' was added with value: ${stringify(node.value)}`;
+      case 'deleted':
+        return `Property '${fullKey}' was removed`;
+      case 'changed':
+        return `Property '${fullKey}' was updated. From ${stringify(node.value1)} to ${stringify(node.value2)}`;
+      case 'unchanged':
+        return [];
+      case 'nested':
+        return treeFormatterPlain(node.children, fullKey);
+      default:
+        return 'Error';
     }
   });
-  return iter(tree.children, []);
-}
+  return result.join('\n');
+};
 
-export default function makePlain(data) {
-  const result = makePlainDiff(data);
-  return _.flattenDeep(result).filter((el) => el).join('\n');
-}
+export default treeFormatterPlain;

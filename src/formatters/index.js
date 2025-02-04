@@ -1,15 +1,15 @@
-import makePlain from './plain.js';
-import makeStylish from './stylish.js';
+import treeFormatterStylish from './stylish.js';
+import treeFormatterPlain from './plain.js';
 
-export default function formatter(tree, format) {
-  switch (format) {
-    case 'stylish':
-      return makeStylish(tree);
-    case 'plain':
-      return makePlain(tree);
-    case 'json':
-      return JSON.stringify(tree);
-    default:
-      throw new Error('Uncorrect data');
+const chooseFormatter = (tree, formatter) => {
+  if (formatter === 'stylish') {
+    return treeFormatterStylish(tree);
+  } if (formatter === 'plain') {
+    return treeFormatterPlain(tree);
+  } if (formatter === 'json') {
+    return JSON.stringify(tree, null, 4);
   }
-}
+  return 'Error';
+};
+
+export default chooseFormatter;

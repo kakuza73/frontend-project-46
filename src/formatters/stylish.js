@@ -1,55 +1,41 @@
 import _ from 'lodash';
 
-const indent = ' ';
-const indentSize = 4;
-const currentIndent = (depth) => indent.repeat(indentSize * depth - 2);
-const braceIndent = (depth) => indent.repeat(indentSize * depth - indentSize);
+const fourSpaces = '    ';
+const getCurrentIndent = (depth) => `${fourSpaces.repeat(depth - 1)}${fourSpaces.slice(0, 2)}`;
+const getBracketIndent = (depth) => fourSpaces.repeat(depth - 1);
 
-const joinStrings = (lines, depth) => [
-  '{',
-  ...lines,
-  `${braceIndent(depth)}}`,
-].join('\n');
-
-const stringify = (data, depth) => {
-  if ((!_.isObject(data)) || (data === null)) {
-    return String(data);
+const stringify = (value, depth = 1) => {
+  if (!(_.isObject(value))) {
+    return `${value}`;
   }
-  const keys = _.keys(data);
-  const lines = keys.map((key) => `${currentIndent(depth)}  ${key}: ${stringify(data[key], depth + 1)}`);
-  return joinStrings(lines, depth);
+  const keys = Object.keys(value);
+  const result = keys.flatMap((key) => `${getCurrentIndent(depth + 1)}  ${key}: ${stringify(value[key], depth + 1)}`);
+  return `{\n${result.join('\n')}\n${getBracketIndent(depth + 1)}}`;
 };
 
-const makeStylishDiff = (tree) => {
-  const iter = (node, depth) => {
-    switch (node.type) {
-      case 'root': {
-        const result = node.children.flatMap((child) => iter(child, depth));
-        return joinStrings(result, depth);
-      }
-      case 'nested': {
-        const childrenToString = node.children.flatMap((child) => iter(child, depth + 1));
-        return `${currentIndent(depth)}  ${node.key}: ${joinStrings(childrenToString, depth + 1)}`;
-      }
-      case 'added': {
-        return `${currentIndent(depth)}+ ${node.key}: ${stringify(node.value, depth + 1)}`;
-      }
-      case 'removed': {
-        return `${currentIndent(depth)}- ${node.key}: ${stringify(node.value, depth + 1)}`;
-      }
-      case 'changed': {
-        return [`${currentIndent(depth)}- ${node.key}: ${stringify(node.oldValue, depth + 1)}`,
-          `${currentIndent(depth)}+ ${node.key}: ${stringify(node.newValue, depth + 1)}`];
-      }
-      case 'unchanged': {
-        return `${currentIndent(depth)}  ${node.key}: ${stringify(node.value, depth + 1)}`;
-      }
-      default: {
-        throw Error('Uncorrect data');
-      }
+const treeFormatterStylish = (tree, depth = 1) => {
+  const result = tree.flatMap((node) => {
+    const {
+      key, value, value1, value2, status, children,
+    } = node;
+
+    switch (status) {
+      case 'added':
+        return `${getCurrentIndent(depth)}+ ${key}: ${stringify(value, depth)}`;
+      case 'deleted':
+        return `${getCurrentIndent(depth)}- ${key}: ${stringify(value, depth)}`;
+      case 'changed':
+        return `${getCurrentIndent(depth)}- ${key}: ${stringify(value1, depth)}\n`
+                + `${getCurrentIndent(depth)}+ ${key}: ${stringify(value2, depth)}`;
+      case 'unchanged':
+        return `${getCurrentIndent(depth)}  ${key}: ${stringify(value, depth)}`;
+      case 'nested':
+        return `${getCurrentIndent(depth)}  ${key}: ${treeFormatterStylish(children, depth + 1)}`;
+      default:
+        throw new Error(`Unknow status: ${status}`);
     }
-  };
-  return iter(tree, 1);
+  });
+  return `{\n${result.join('\n')}\n${getBracketIndent(depth)}}`;
 };
 
-export default makeStylishDiff;
+export default treeFormatterStylish;
