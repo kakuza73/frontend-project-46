@@ -2,11 +2,11 @@
 #### Hexlet tests and linter status:
 [![Actions Status](https://github.com/kakuza73/frontend-project-46/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kakuza73/frontend-project-46/actions)
 
-
+[![Maintainability](https://api.codeclimate.com/v1/badges/ffd2e7f4d42e6163b317/maintainability)](https://codeclimate.com/github/kakuza73/frontend-project-46/maintainability)
 # Diff Tool Project
 
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/kakuza73/frontend-project-46/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kakuza73/frontend-project-46/actions)
+
+
 
 ## About project
 __Diff Tool__ - is a program that compares two files, identifies the differences between them, and displays them to the user. It supports the following file formats: JSON, YAML, and YAML.
