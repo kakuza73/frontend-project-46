@@ -15,6 +15,7 @@ const expectJson = readFile(fixturePath('expectJson.txt'));
 const expectStylish = readFile(fixturePath('expectStylish.txt'));
 const expectPlain = readFile(fixturePath('expectPlain.txt'));
 
+describe('gendiff', () => {
 test('unsupport format', () => {
   const data = 'data';
   const format = 'txt';
@@ -32,3 +33,4 @@ test('Plain builder', () => {
 test('Json builder', () => {
   expect(gendiff(filePath1, filePath2, 'json')).toEqual(expectJson);
 });
+})

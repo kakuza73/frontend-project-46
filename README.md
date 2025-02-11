@@ -3,6 +3,8 @@
 [![Actions Status](https://github.com/kakuza73/frontend-project-46/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kakuza73/frontend-project-46/actions)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/ffd2e7f4d42e6163b317/maintainability)](https://codeclimate.com/github/kakuza73/frontend-project-46/maintainability)
+
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ffd2e7f4d42e6163b317/test_coverage)](https://codeclimate.com/github/kakuza73/frontend-project-46/test_coverage)
 # Diff Tool Project
 
 
