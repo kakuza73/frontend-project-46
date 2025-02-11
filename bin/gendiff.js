@@ -11,9 +11,9 @@ program
   .option('-f, --format [type]', 'output format', 'stylish')
   .helpOption('-h, --help', 'output usage information')
   .arguments('<filepath1> <filepath2>')
-  .action((filepath1, filepath2) => {
+  .action((filePath1, filePath1) => {
     const formatter = program.opts().format;
-    const diff = gendiff(filepath1, filepath2, formatter);
+    const diff = gendiff(filePath1, filePath1, formatter);
     console.log(diff);
   });
 program.parse();
