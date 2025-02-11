@@ -33,4 +33,4 @@ describe('gendiff', () => {
   test('Json builder', () => {
     expect(gendiff(filePath1, filePath2, 'json')).toEqual(expectJson);
   });
-})
+});
