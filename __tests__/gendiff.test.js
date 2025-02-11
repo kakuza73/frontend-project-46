@@ -18,16 +18,19 @@ describe('gendiff', () => {
     expect(() => parse('txt', 'data')).toThrow('Not support format: txt');
   });
 
-  const formats = ['json', 'yml', 'yaml'];
+  const formats = [
+    { file1: 'json', file2: 'json' },
+    { file1: 'yml', file2: 'yaml' },
+  ];
   const outputs = [
     ['stylish', expectStylish],
     ['plain', expectPlain],
     ['json', expectJson],
   ];
 
-  test.each(formats)('compare %s files', (format) => {
-    const filePath1 = fixturePath(`file1.${format}`);
-    const filePath2 = fixturePath(`file2.${format}`);
+  test.each(formats)('compare %s and %s files', ({ file1, file2 }) => {
+    const filePath1 = fixturePath(`file1.${file1}`);
+    const filePath2 = fixturePath(`file2.${file2}`);
 
     outputs.forEach(([outputFormat, expected]) => {
       expect(gendiff(filePath1, filePath2, outputFormat)).toEqual(expected);
